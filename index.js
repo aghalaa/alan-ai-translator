@@ -14,7 +14,7 @@ const openai = new OpenAI({
 });
 
 client.once('ready', () => {
-  console.log(`✅ AI Bot logged in as ${client.user.tag}`);
+  console.log(`✅ Bot logged in as ${client.user.tag}`);
 });
 
 client.on('messageCreate', async (message) => {
@@ -36,35 +36,95 @@ client.on('messageCreate', async (message) => {
 
   const text = message.content.trim();
 
-  // Ignore very short messages
-  if (text.length < 4) return;
-
-  // Ignore pure emoji messages
-  const emojiOnly =
-    /^[\p{Emoji}\s]+$/u.test(text);
-
-  if (emojiOnly) return;
-
-  // Ignore mentions only
-  const mentionOnly =
-    /^<@!?\d+>$/.test(text);
-
-  if (mentionOnly) return;
-
-  // Ignore messages with almost no letters
-  const letters =
-    text.match(/[a-zA-Zа-яА-Яء-يäöüß]/g);
-
-  if (!letters || letters.length < 2) return;
+  // Ignore tiny messages
+  if (text.length < 2) return;
 
   try {
 
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4.1-mini',
-      messages: [
-        {
-          role: 'system',
-          content: `
+    // ====================================================
+    // AI CHAT MODE
+    // ====================================================
+
+    if (text.toLowerCase().startsWith('!ai')) {
+
+      const aiPrompt =
+        text.slice(3).trim();
+
+      if (!aiPrompt) {
+        return message.reply(
+          'Usage: !ai your question'
+        );
+      }
+
+      const aiResponse =
+        await openai.chat.completions.create({
+          model: 'gpt-4.1-mini',
+          messages: [
+            {
+              role: 'system',
+              content:
+`You are a helpful Discord AI assistant.
+
+You help with:
+- gaming
+- guides
+- weather
+- tech support
+- jokes
+- casual chatting
+- internet questions
+
+Keep answers casual, helpful and clean.
+Do not make responses extremely long unless requested.`
+            },
+            {
+              role: 'user',
+              content: aiPrompt
+            }
+          ],
+          temperature: 0.7
+        });
+
+      const reply =
+        aiResponse.choices[0]
+        .message.content?.trim();
+
+      if (!reply) return;
+
+      return message.reply(reply);
+    }
+
+    // ====================================================
+    // TRANSLATOR MODE
+    // ====================================================
+
+    // Ignore pure emoji messages
+    const emojiOnly =
+      /^[\p{Emoji}\s]+$/u.test(text);
+
+    if (emojiOnly) return;
+
+    // Ignore mentions only
+    const mentionOnly =
+      /^<@!?\d+>$/.test(text);
+
+    if (mentionOnly) return;
+
+    // Ignore messages with almost no letters
+    const letters =
+      text.match(/[a-zA-Zа-яА-Яء-يäöüß]/g);
+
+    if (!letters || letters.length < 2)
+      return;
+
+    const response =
+      await openai.chat.completions.create({
+        model: 'gpt-4.1-mini',
+        messages: [
+          {
+            role: 'system',
+            content:
+`
 You are a live Discord translator.
 
 DEFAULT BEHAVIOR:
@@ -93,19 +153,19 @@ IMPORTANT RULES:
 - ONLY return translated text.
 - Put every translation on a new line.
 `
-        },
-        {
-          role: 'user',
-          content: text
-        }
-      ],
-      temperature: 0.3
-    });
+          },
+          {
+            role: 'user',
+            content: text
+          }
+        ],
+        temperature: 0.3
+      });
 
     const translated =
-      response.choices[0].message.content?.trim();
+      response.choices[0]
+      .message.content?.trim();
 
-    // Ignore empty replies
     if (!translated) return;
 
     // Ignore identical replies
@@ -117,7 +177,7 @@ IMPORTANT RULES:
     await message.reply(translated);
 
   } catch (err) {
-    console.error("ERROR:", err);
+    console.error('ERROR:', err);
   }
 });
 

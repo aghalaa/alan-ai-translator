@@ -22,11 +22,14 @@ client.on('messageCreate', async (message) => {
   // ignore bots
   if (message.author.bot) return;
 
-  // ignore gifs/images/files
-  if (message.attachments.size > 0) return;
+// ignore gifs/images/files
+if (message.attachments.size > 0) return;
 
-  // ignore empty messages
-  if (!message.content?.trim()) return;
+// ignore embeds/gifs
+if (message.embeds.length > 0) return;
+
+// ignore empty messages
+if (!message.content?.trim()) return;
 
   // ignore tiny fragments
   if (message.content.trim().length < 4) return;

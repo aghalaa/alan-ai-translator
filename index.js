@@ -66,7 +66,8 @@ If the LAST word of the message is a language code:
 - ar = Arabic
 - de = German
 
-Then translate the message into that language instead.
+Then IGNORE the default English/Russian behavior
+and ONLY translate into the requested language.
 
 IMPORTANT:
 - The language code is always the LAST word.

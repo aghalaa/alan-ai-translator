@@ -19,20 +19,20 @@ client.once('ready', () => {
 
 client.on('messageCreate', async (message) => {
 
-  // ignore bots
+  // Ignore bots
   if (message.author.bot) return;
 
-  // ignore gifs/images/files
+  // Ignore gifs/images/files
   if (message.attachments.size > 0) return;
 
-  // ignore embeds/gifs
+  // Ignore embeds
   if (message.embeds.length > 0) return;
 
-  // ignore empty messages
+  // Ignore empty messages
   if (!message.content?.trim()) return;
 
-  // ignore tiny fragments
-  if (message.content.trim().length < 4) return;
+  // Ignore very short messages
+  if (message.content.trim().length < 2) return;
 
   try {
 
@@ -41,29 +41,31 @@ client.on('messageCreate', async (message) => {
       messages: [
         {
           role: 'system',
-          content:
-`You are a live Discord translator.
+          content: `
+You are a live Discord translator.
 
-DEFAULT RULES:
-- English messages -> Russian
-- Russian messages -> English
+DEFAULT BEHAVIOR:
+- English -> Russian
+- Russian -> English
 
 SPECIAL LANGUAGE OVERRIDE:
-If the LAST word is:
-- ru = translate to Russian
+If the LAST word of the message is:
 - en = translate to English
+- ru = translate to Russian
 - de = translate to German
 - ar = translate to Arabic
 
 Examples:
 "Hello de" -> "Hallo"
 "مرحبا en" -> "Hello"
+"Wie geht's ru" -> "Как дела"
 
-IMPORTANT:
-- The last word can be a language code.
-- REMOVE the language code from the final translation.
-- Keep slang, gaming terms, abbreviations, and emotions natural.
-- ONLY return translated text.`
+IMPORTANT RULES:
+- The language code is always the LAST word.
+- REMOVE the language code from the final output.
+- Keep slang, gaming language, abbreviations, emotions and casual tone natural.
+- ONLY return the translated text.
+`
         },
         {
           role: 'user',
@@ -74,7 +76,9 @@ IMPORTANT:
     });
 
     const translated =
-      response.choices[0].message.content;
+      response.choices[0].message.content?.trim();
+
+    if (!translated) return;
 
     await message.reply(translated);
 

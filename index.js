@@ -90,8 +90,8 @@ IMPORTANT RULES:
 - Remove language codes from final output.
 - Keep slang, gaming terms, abbreviations and emotions natural.
 - Ignore emojis and mentions naturally.
+- ONLY return translated text.
 - Put every translation on a new line.
-- ALWAYS add "burn law" at the end of every translation.
 `
         },
         {

@@ -36,17 +36,6 @@ client.on('messageCreate', async (message) => {
 
   try {
 
-    const parts = message.content.trim().split(" ");
-    const lastWord = parts[parts.length - 1].toLowerCase();
-
-    const supported = ["ru", "en", "ar", "de"];
-
-    let cleanMessage = message.content;
-
-    if (supported.includes(lastWord)) {
-      cleanMessage = parts.slice(0, -1).join(" ");
-    }
-
     const response = await openai.chat.completions.create({
       model: 'gpt-4.1-mini',
       messages: [
@@ -55,29 +44,30 @@ client.on('messageCreate', async (message) => {
           content:
 `You are a live Discord translator.
 
-Default behavior:
-- If message is English -> translate to Russian.
-- If message is Russian -> translate to English.
+DEFAULT RULES:
+- English messages -> Russian
+- Russian messages -> English
 
-Special override:
-If the LAST word of the message is a language code:
-- en = English
-- ru = Russian
-- ar = Arabic
-- de = German
+SPECIAL LANGUAGE OVERRIDE:
+If the LAST word is:
+- ru = translate to Russian
+- en = translate to English
+- de = translate to German
+- ar = translate to Arabic
 
-Then IGNORE the default English/Russian behavior
-and ONLY translate into the requested language.
+Examples:
+"Hello de" -> "Hallo"
+"مرحبا en" -> "Hello"
 
 IMPORTANT:
-- The language code is always the LAST word.
-- Remove the language code from the final output.
+- The last word can be a language code.
+- REMOVE the language code from the final translation.
 - Keep slang, gaming terms, abbreviations, and emotions natural.
-- Only return the translated message.`
+- ONLY return translated text.`
         },
         {
           role: 'user',
-          content: cleanMessage
+          content: message.content
         }
       ],
       temperature: 0.3

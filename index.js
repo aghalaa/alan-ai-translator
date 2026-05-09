@@ -31,7 +31,7 @@ client.on('messageCreate', async (message) => {
   // Ignore empty messages
   if (!message.content?.trim()) return;
 
-  // Ignore very short messages
+  // Ignore tiny messages
   if (message.content.trim().length < 2) return;
 
   try {
@@ -48,23 +48,30 @@ DEFAULT BEHAVIOR:
 - English -> Russian
 - Russian -> English
 
-SPECIAL LANGUAGE OVERRIDE:
-If the LAST word of the message is:
-- en = translate to English
-- ru = translate to Russian
-- de = translate to German
-- ar = translate to Arabic
+MULTI LANGUAGE OVERRIDE:
+If the LAST words contain language codes:
+- en = English
+- ru = Russian
+- de = German
+- ar = Arabic
+
+Translate the message into ALL requested languages.
 
 Examples:
-"Hello de" -> "Hallo"
-"مرحبا en" -> "Hello"
-"Wie geht's ru" -> "Как дела"
+"hello ru de"
+-> 🇷🇺 Привет
+-> 🇩🇪 Hallo
+
+"مرحبا en de"
+-> 🇬🇧 Hello
+-> 🇩🇪 Hallo
 
 IMPORTANT RULES:
-- The language code is always the LAST word.
-- REMOVE the language code from the final output.
-- Keep slang, gaming language, abbreviations, emotions and casual tone natural.
-- ONLY return the translated text.
+- Language codes are ALWAYS at the END.
+- Remove language codes from the final output.
+- Keep slang, abbreviations, gaming language and emotions natural.
+- ONLY return translations.
+- Put each translation on a new line.
 `
         },
         {
